@@ -1,16 +1,9 @@
-# telly
+# ewitsdevan/telly
+## A fork of [tellytv/telly](https://github.com/tellytv/telly) that adds support for arm64
 
 IPTV proxy for Plex Live written in Golang
 
-Please refer to the [Wiki](https://github.com/tellytv/telly/wiki) for the most current documentation.
-
-## This readme refers to version 1.1.x .  It does not apply to versions other than that.
-
-The [Wiki](https://github.com/tellytv/telly/wiki) includes walkthroughs for most platforms that go into more detail than listed below:
-
-## THIS IS A DEVELOPMENT BRANCH
-
-It is under active development and things may change quickly and dramatically.  Please join the discord server if you use this branch and be prepared for some tinkering and breakage.
+Please refer to tellytv's [Wiki](https://github.com/tellytv/telly/wiki) for the most current documentation.
 
 # Configuration
 
@@ -101,10 +94,10 @@ To take advantage of this, ffmpeg must be installed and available in your path.
 
 There are two different docker images available:
 
-## tellytv/telly:dev
-The standard docker image for the dev branch
+## ewitsdevan/telly
+The standard docker image
 
-## tellytv/telly:dev-ffmpeg
+## ewitsdevan/telly-ffmpeg
 This docker image has ffmpeg preinstalled.  If you want to use the ffmpeg feature, use this image.  It may be safest to use this image generally, since it is not much larger than the standard image and allows you to turn the ffmpeg features on and off without requiring changes to your docker run command.  The examples below use this image.
 
 ## `docker run`
@@ -112,31 +105,29 @@ This docker image has ffmpeg preinstalled.  If you want to use the ffmpeg featur
 docker run -d \
   --name='telly' \
   --net='bridge' \
-  -e TZ="America/Chicago" \
+  -e TZ="Australia/Melbourne" \
   -p '6077:6077/tcp' \
-  -v /host/path/to/telly.config.toml:/etc/telly/telly.config.toml \
+  -v /host/path/to/telly:/etc/telly \
   --restart unless-stopped \
-  tellytv/telly:dev-ffmpeg
+  ewitsdevan/telly-ffmpeg
+  
 ```
 
 ## docker-compose
 ```
 telly:
-  image: tellytv/telly:dev-ffmpeg
+  image: ewitsdevan/telly-ffmpeg
   ports:
     - "6077:6077"
   environment:
     - TZ=Europe/Amsterdam
   volumes:
-    - /host/path/to/telly.config.toml:/etc/telly/telly.config.toml
+    - /host/path/to/telly:/etc/telly
   restart: unless-stopped
 ```
 
 # Troubleshooting
 
-Please free to [open an issue](https://github.com/tellytv/telly/issues) if you run into any problems at all, we'll be more than happy to help.
+Please free to [open an issue](https://github.com/ewitsdevan/telly/issues) if you run into any problems at all, we'll be more than happy to help.
 
-# Social
-
-We have [a Discord server you can join!](https://discord.gg/bnNC8qX)
 
