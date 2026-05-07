@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	m3u "github.com/tellytv/telly/internal/m3uplus"
-	"github.com/tellytv/telly/internal/xmltv"
+	m3u "github.com/ewitsdevan/telly/internal/m3uplus"
+	"github.com/ewitsdevan/telly/internal/xmltv"
 )
 
 var streamNumberRegex = regexp.MustCompile(`/(\d+).(ts|.*.m3u8)`).FindAllStringSubmatch

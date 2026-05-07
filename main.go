@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
+	version2 "github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/common/version"
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
@@ -140,7 +141,7 @@ func main() {
 		}
 	}
 
-	prometheus.MustRegister(version.NewCollector("telly"), exposedChannels)
+	prometheus.MustRegister(version2.NewCollector("telly"), exposedChannels)
 
 	level, parseLevelErr := logrus.ParseLevel(viper.GetString("log.level"))
 	if parseLevelErr != nil {

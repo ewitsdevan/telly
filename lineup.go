@@ -8,16 +8,17 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	m3u "github.com/ewitsdevan/telly/internal/m3uplus"
+	"github.com/ewitsdevan/telly/internal/providers"
+	"github.com/ewitsdevan/telly/internal/xmltv"
 	"github.com/spf13/viper"
 	schedulesdirect "github.com/tellytv/go.schedulesdirect"
-	m3u "github.com/tellytv/telly/internal/m3uplus"
-	"github.com/tellytv/telly/internal/providers"
-	"github.com/tellytv/telly/internal/xmltv"
 )
 
 // var channelNumberRegex = regexp.MustCompile(`^[0-9]+[[:space:]]?$`).MatchString
@@ -156,7 +157,7 @@ func (l *lineup) Scan() error {
 
 func (l *lineup) processProvider(provider providers.Provider) (int, error) {
 	addedChannels := 0
-	m3u, channelMap, programmeMap, prepareErr := l.prepareProvider(provider)
+	_m3u, channelMap, programmeMap, prepareErr := l.prepareProvider(provider)
 	if prepareErr != nil {
 		log.WithError(prepareErr).Errorln("error when preparing provider")
 		return 0, prepareErr
@@ -164,13 +165,13 @@ func (l *lineup) processProvider(provider providers.Provider) (int, error) {
 
 	if provider.Configuration().SortKey != "" {
 		sortKey := provider.Configuration().SortKey
-		sort.Slice(m3u.Tracks, func(i, j int) bool {
-			if _, ok := m3u.Tracks[i].Tags[sortKey]; ok {
+		sort.Slice(_m3u.Tracks, func(i, j int) bool {
+			if _, ok := _m3u.Tracks[i].Tags[sortKey]; ok {
 				log.Panicf("the provided sort key (%s) doesn't exist in the M3U!", sortKey)
 				return false
 			}
-			ii := m3u.Tracks[i].Tags[sortKey]
-			jj := m3u.Tracks[j].Tags[sortKey]
+			ii := _m3u.Tracks[i].Tags[sortKey]
+			jj := _m3u.Tracks[j].Tags[sortKey]
 			if provider.Configuration().SortReverse {
 				return ii < jj
 			}
@@ -181,7 +182,7 @@ func (l *lineup) processProvider(provider providers.Provider) (int, error) {
 	successChannels := []string{}
 	failedChannels := []string{}
 
-	for _, track := range m3u.Tracks {
+	for _, track := range _m3u.Tracks {
 		// First, we run the filter.
 		if !l.FilterTrack(provider, track) {
 			failedChannels = append(failedChannels, track.Name)
@@ -387,7 +388,7 @@ func (l *lineup) prepareEPG(provider providers.Provider, cacheFiles bool) (map[s
 
 			allResponses := make([]schedulesdirect.ProgramInfo, 0)
 
-			artworkMap := make(map[string][]schedulesdirect.ProgramArtwork)
+			artworkMap := make(map[string][]schedulesdirect.Artwork)
 
 			chunks := chunkStringSlice(tmsIDs, 5000)
 
@@ -435,8 +436,7 @@ func (l *lineup) prepareEPG(provider providers.Provider, cacheFiles bool) (map[s
 			log.Debugf("Got %d responses from SD", len(allResponses))
 
 			for _, sdResponse := range allResponses {
-				programme := sdEligible[sdResponse.ProgramID]
-				mergedProgramme := MergeSchedulesDirectAndXMLTVProgramme(&programme, sdResponse, artworkMap[sdResponse.ProgramID])
+				mergedProgramme := MergeSchedulesDirectAndXMLTVProgramme(new(sdEligible[sdResponse.ProgramID]), sdResponse, artworkMap[sdResponse.ProgramID])
 				haveAllInfo[mergedProgramme.Channel] = append(haveAllInfo[mergedProgramme.Channel], *mergedProgramme)
 			}
 		}
@@ -577,18 +577,14 @@ func chunkStringSlice(sl []string, chunkSize int) [][]string {
 	var divided [][]string
 
 	for i := 0; i < len(sl); i += chunkSize {
-		end := i + chunkSize
-
-		if end > len(sl) {
-			end = len(sl)
-		}
+		end := min(i+chunkSize, len(sl))
 
 		divided = append(divided, sl[i:end])
 	}
 	return divided
 }
 
-func MergeSchedulesDirectAndXMLTVProgramme(programme *xmltv.Programme, sdProgram schedulesdirect.ProgramInfo, artworks []schedulesdirect.ProgramArtwork) *xmltv.Programme {
+func MergeSchedulesDirectAndXMLTVProgramme(programme *xmltv.Programme, sdProgram schedulesdirect.ProgramInfo, artworks []schedulesdirect.Artwork) *xmltv.Programme {
 
 	allTitles := make([]string, 0)
 
@@ -880,10 +876,5 @@ func countDigits(i int) int {
 }
 
 func contains(s []string, e string) bool {
-	for _, ss := range s {
-		if e == ss {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(s, e)
 }

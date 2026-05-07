@@ -1,6 +1,6 @@
 GO    := go
 GOPATH ?= $(HOME)/go
-PROMU := $(GOPATH)/bin/promu
+PROMU := /opt/local/bin/promu
 
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
@@ -49,7 +49,7 @@ docker: cross
 promu:
 	@GO111MODULE=off \
 		    GOOS=$(shell uname -s | tr A-Z a-z) \
-	        GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
+	        GOARCH=arm64 \
 	        $(GO) get -u github.com/prometheus/promu
 
 

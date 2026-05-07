@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	m3u "github.com/tellytv/telly/internal/m3uplus"
-	"github.com/tellytv/telly/internal/xmltv"
+	m3u "github.com/ewitsdevan/telly/internal/m3uplus"
+	"github.com/ewitsdevan/telly/internal/xmltv"
 )
 
 // http://irislinks.net:83/get.php?username=username&password=password&type=m3uplus&output=ts

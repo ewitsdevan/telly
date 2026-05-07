@@ -13,14 +13,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ewitsdevan/telly/internal/xmltv"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
-	ssdp "github.com/koron/go-ssdp"
+	"github.com/koron/go-ssdp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	ginprometheus "github.com/tellytv/telly/internal/go-gin-prometheus"
-	"github.com/tellytv/telly/internal/xmltv"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 func serve(lineup *lineup) {

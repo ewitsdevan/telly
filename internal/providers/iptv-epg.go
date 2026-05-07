@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	m3u "github.com/tellytv/telly/internal/m3uplus"
-	"github.com/tellytv/telly/internal/xmltv"
+	m3u "github.com/ewitsdevan/telly/internal/m3uplus"
+	"github.com/ewitsdevan/telly/internal/xmltv"
 )
 
 // M3U: http://iptv-epg.com/<random string>.m3u
